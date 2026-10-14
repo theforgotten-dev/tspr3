@@ -1,0 +1,8 @@
+cmake_minimum_required(VERSION 3.16)
+project(TSPR3InstalledConsumer LANGUAGES C CXX)
+find_package(TSPR3 0.1 CONFIG REQUIRED)
+add_executable(consumer_c ../../examples/c/basic.c)
+add_executable(consumer_cpp ../../examples/cpp/basic.cpp)
+target_link_libraries(consumer_c PRIVATE TSPR3::tspr3)
+target_link_libraries(consumer_cpp PRIVATE TSPR3::tspr3)
+target_compile_features(consumer_cpp PRIVATE cxx_std_17)

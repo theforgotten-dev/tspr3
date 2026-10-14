@@ -1,0 +1,20 @@
+name: Library contracts
+on: [push, pull_request]
+jobs:
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: C and C++ package contracts
+        shell: powershell
+        run: .\build.ps1 -Task c
+      - name: Java and JNI contracts
+        shell: powershell
+        run: .\build.ps1 -Task java -Native
+      - name: Maven sources and Javadoc
+        shell: powershell
+        run: .\build.ps1 -Task maven

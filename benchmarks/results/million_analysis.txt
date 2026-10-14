@@ -1,0 +1,35 @@
+﻿scenario,median_paired_FULL_speedup,median_AUTO_over_best,methods
+random_wide,6.528,1.000,5
+random_bounded,6.725,1.016,5
+ascending,9.327,1.000,2
+descending,8.893,1.000,3
+equal,8.489,1.000,2
+k8,31.523,1.000,6
+k64,45.385,1.000,6
+k512,45.283,1.000,6
+k2048,56.329,1.000,6
+k8192,48.488,1.000,6
+k32768,41.232,1.000,6
+k131072,7.235,1.036,5
+sparse8,4.821,1.039,1
+sparse2048,9.113,1.000,1
+separated,6.276,1.000,4
+interleaved,2.057,1.046,5
+organ_pipe,3.265,1.000,7
+sawtooth,13.363,1.000,6
+nearly_sorted_one,3.521,1.000,7
+nearly_sorted_100,1.431,1.114,5
+runs16,3.428,1.000,7
+extremes,8.234,1.178,1
+duplicate_prefix,2.124,1.231,5
+duplicate_suffix,2.617,1.033,5
+skew99,10.938,1.000,8
+outlier,9.641,1.044,1
+descending_groups,12.531,1.000,3
+permutation,7.018,1.201,5
+constant_low_bytes,9.500,1.049,5
+signed_boundaries,9.075,1.079,1
+paired_inputs=150, timed_outputs=750
+AUTO wins FULL on 150/150 paired inputs
+Median paired FULL speedup=8.284
+Worst AUTO/best single measured run=1.678

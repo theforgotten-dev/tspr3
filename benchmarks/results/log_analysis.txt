@@ -1,0 +1,44 @@
+﻿held_out_inputs=72; selections={'TERNAS': 45, 'TERNAS_FREQ': 27}
+Chosen measured fastest=62/72; median choice/best=1.000; worst=1.149
+Median paired BASE/choice=1.000
+TERNAS held-out median relative prediction error=15.92%
+TERNAS_FREQ held-out median relative prediction error=15.17%
+TERNAS_BIN held-out median relative prediction error=17.58%
+scenario,selected_modes,median_total_ms
+random_wide,TERNAS,175.929
+random_bounded,TERNAS,175.329
+ascending,TERNAS,29.790
+descending,TERNAS,32.039
+equal,TERNAS_FREQ,28.806
+k8,TERNAS_FREQ,64.148
+k64,TERNAS_FREQ,88.113
+k512,TERNAS_FREQ,111.319
+k2048,TERNAS/TERNAS_FREQ,137.122
+k8192,TERNAS,151.173
+k32768,TERNAS,158.305
+k131072,TERNAS,168.988
+sparse8,TERNAS_FREQ,64.869
+sparse2048,TERNAS_FREQ,131.653
+separated,TERNAS,35.391
+interleaved,TERNAS,66.338
+organ_pipe,TERNAS,38.207
+sawtooth,TERNAS,63.999
+nearly_sorted_one,TERNAS,32.365
+nearly_sorted_100,TERNAS,42.403
+runs16,TERNAS,38.993
+extremes,TERNAS_FREQ,51.026
+duplicate_prefix,TERNAS,94.022
+duplicate_suffix,TERNAS,79.913
+skew99,TERNAS_FREQ,33.809
+outlier,TERNAS_FREQ,90.677
+descending_groups,TERNAS_FREQ,32.038
+permutation,TERNAS,176.142
+constant_low_bytes,TERNAS,185.103
+signed_boundaries,TERNAS_FREQ,46.045
+normal_wide,TERNAS,189.814
+normal_quantized,TERNAS_FREQ,77.113
+normal_local,TERNAS,102.222
+lognormal,TERNAS_FREQ,111.243
+bimodal,TERNAS,155.665
+normal_clusters,TERNAS,110.847
+Choice/best uses matched timings from tri_2m_raw.csv, not the separate end-to-end validation run.
