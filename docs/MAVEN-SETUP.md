@@ -58,6 +58,18 @@ Consulta la [guía oficial del token](https://central.sonatype.org/publish/gener
 
 ## 3. Firmar y subir para revisión
 
+Para la clave configurada en este proyecto, el comando interactivo preparado es:
+
+```powershell
+Set-Location E:\proys\algoritmoOrdenamiento
+.\scripts\publish-central.ps1
+```
+
+Solicita username y password del token y contraseña GPG con entrada oculta.
+Usa el almacén TSPR3 y la huella verificada; restaura el entorno al terminar.
+`-CheckOnly` comprueba disponibilidad de la clave y metadata sin pedir secretos
+ni subir. El envío real queda para revisión manual, con `autoPublish=false`.
+
 En la misma sesión de PowerShell, introduce los secretos mediante entrada
 oculta. Las variables solo se usan durante el comando y se restauran al terminar.
 No pegues los secretos directamente dentro de comandos ni los envíes por chat.
