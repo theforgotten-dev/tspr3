@@ -33,7 +33,7 @@ todos los beneficios debidos a duplicados o estructura previa.
 Para reproducir el ajuste (Python estándar, sin paquetes adicionales):
 
 ```powershell
-python .\tools\analysis\analyze_benchmark.py measurements\calibration.csv
+python .\tools\analysis\analyze_benchmark.py benchmarks\results\calibration.csv
 ```
 
 Con x = n, z = k*log2(max(k,2)), y = tiempo FREQ, mínimos cuadrados sin intercepto:

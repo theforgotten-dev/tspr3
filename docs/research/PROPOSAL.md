@@ -189,7 +189,7 @@ En PowerShell:
 
 ```powershell
 py -3 --version
-py -3 .\tspr3_verify.py
+py -3 .\experiments\legacy\python\tspr3_verify.py
 ```
 
 ### Cómo interpretar el benchmark

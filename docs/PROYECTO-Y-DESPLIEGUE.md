@@ -16,6 +16,8 @@ Versión distribuida: 0.1.0. Licencia: [Apache-2.0](../LICENSE).
 El documento sirve como guía técnica de la biblioteca y como registro operativo
 de su distribución. Los informes de investigación conservan las mediciones
 históricas; las guías de API contienen los contratos detallados.
+El [catálogo PowerShell](POWERSHELL.md) reúne todos los scripts, flags, comandos
+manuales y recorridos de diagnóstico, GitHub y Sonatype.
 
 ## 1. Objetivo y alcance
 

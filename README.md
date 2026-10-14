@@ -50,6 +50,8 @@ docs/               Arquitectura, contratos y publicacion
 
 ## Documentacion
 
+- [Todos los comandos PowerShell del proyecto](docs/POWERSHELL.md).
+
 - [Proyecto completo, actores y etapas de despliegue](docs/PROYECTO-Y-DESPLIEGUE.md).
 
 - [Arquitectura: Facade, Strategy y Policy](docs/ARCHITECTURE.md).
