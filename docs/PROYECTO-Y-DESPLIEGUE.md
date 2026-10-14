@@ -4,6 +4,19 @@ Autor: Juan Pablo Muñoz Leiva (`theforgotten-dev`).
 Fecha de estado: 14 de octubre de 2026, America/Santiago.
 Versión distribuida: 0.1.0. Licencia: [Apache-2.0](../LICENSE).
 
+## Recorrido de lectura
+
+- [Objetivo y alcance](#1-objetivo-y-alcance).
+- [Algoritmo, duplicados y selección](#2-variantes-del-algoritmo-y-selección).
+- [Arquitectura e integración](#3-arquitectura-y-componentes).
+- [Actores y responsabilidades](#4-actores-y-responsabilidades).
+- [Construcción, jobs y publicación](#5-etapas-del-despliegue).
+- [Estado y próximos pasos](#6-estado-actual-y-próximos-pasos).
+
+El documento sirve como guía técnica de la biblioteca y como registro operativo
+de su distribución. Los informes de investigación conservan las mediciones
+históricas; las guías de API contienen los contratos detallados.
+
 ## 1. Objetivo y alcance
 
 TSPR3 es una biblioteca experimental de ordenamiento de enteros de 32 bits.
@@ -22,12 +35,68 @@ experimentales dependen de la distribución y no prueban superioridad general.
 
 ## 2. Variantes del algoritmo y selección
 
+### 2.1. De la propuesta inicial al ordenamiento completo
+
+Para una entrada de longitud `n` se forman `ceil(n/3)` bloques consecutivos:
+
+```text
+T_i = entrada[3*i : min(3*i + 3, n)]
+```
+
+La propuesta inicial estudiaba suma, mínimo y máximo por bloque. Ordenar las
+sumas no garantiza el orden global de los elementos: `[0,0,100]` suma 100 y
+`[30,30,30]` suma 90, pero concatenarlas por suma coloca 30 antes de 0. La
+biblioteca actual produce el orden global mediante ordenamiento local y fusión.
+No reconstruye todos los bloques a partir de sus sumas ni depende de esa operación.
+
+Los nombres A/B de la propuesta histórica SUM/FULL tienen un significado
+diferente de A/B/C en la API actual. En este documento y en la biblioteca,
+A significa ternas, B frecuencias y C índice de prefijos. Para el origen,
+consulta [PROPOSAL.md](research/PROPOSAL.md).
+
+### 2.2. Estrategias disponibles
+
 | Estrategia | Procedimiento | Aplicación |
 |---|---|---|
 | A: ternas | Ordena bloques de hasta tres valores y los fusiona aprovechando extremos. | Salida ordenada completa. |
 | B: frecuencias | Compacta ternas en pares de valor y cantidad; combina cantidades iguales al fusionar. | Ordenamiento y salida compacta. |
 | C: índice binario | Indexa bloques compactos por prefijos; resuelve bloques que cruzan límites. | Alternativa experimental explícita. |
 | AUTO | Examina una muestra y elige una estrategia. | Política independiente de los motores. |
+
+Ejemplo común a las tres rutas:
+
+```text
+Entrada:          [9,8,9, 15,12,13, 8,8,9]
+Ternas ordenadas: [8,9,9] [12,13,15] [8,8,9]
+Salida completa:  [8,8,8,9,9,9,12,13,15]
+Salida compacta:  [(8,3),(9,3),(12,1),(13,1),(15,1)]
+```
+
+A fusiona secuencias ordenadas. Si el máximo de una no supera el mínimo de la
+otra, puede concatenarlas evitando comparaciones elemento a elemento; mover
+los datos sigue teniendo costo. B inicia el mismo ejemplo como
+`[(8,1),(9,2)]`, `[(12,1),(13,1),(15,1)]` y `[(8,2),(9,1)]`, y combina las
+cantidades de valores iguales durante la fusión.
+
+La frecuencia global exacta aparece al terminar esas fusiones. Los indicadores
+del muestreo previo estiman repeticiones; no cuentan de forma exacta todas las
+ocurrencias globales. La compactación conserva la suma de cantidades igual a `n`.
+
+C transforma cada entero a una clave de orden sin signo:
+
+```text
+key(x) = uint32(x) XOR 0x80000000
+prefijo(T) = clz(key(min(T)) XOR key(max(T)))
+```
+
+La transformación mantiene el orden de los enteros con signo. `clz` representa
+la cantidad de bits iniciales iguales; si ambas claves coinciden, el prefijo
+abarca los 32 bits. Se indexa el bloque completo, no cada elemento por pasadas
+de dígitos. Un bloque que cruza una frontera permanece en el ancestro adecuado.
+El motor combina sus registros con los descendientes y solo concatena regiones
+cuando las condiciones de separación lo permiten. Véase [TRI-BIN.md](research/TRI-BIN.md).
+
+### 2.3. Selección predictiva y fórmulas
 
 En C, AUTO usa indicadores de repeticiones, separación de rangos, prefijos y
 amplitudes logarítmicas. La transformación de perfil es:
@@ -54,6 +123,30 @@ ruta más rápida observada en 62 de las 72 entradas reservadas. Esa reserva mid
 nuevas semillas de las mismas familias, no distribuciones desconocidas. Fórmulas,
 resultados y límites: [RUN-2M.md](research/RUN-2M.md). Los tiempos anteriores
 no deben presentarse como mediciones nuevas de cada revisión del repositorio.
+
+No se presupone una distribución normal ni se modifica la entrada para producirla.
+Normal, lognormal y bimodal son familias de prueba. El logaritmo transforma el
+perfil para comparar amplitudes de distinta escala; no reemplaza el ordenamiento.
+
+### 2.4. Elección y límites de rendimiento
+
+| Necesidad | Elección inicial | Comprobación recomendada |
+|---|---|---|
+| Ordenar sin calibración específica | AUTO o A explícita. | Contrastar ambas sobre entradas representativas. |
+| Obtener frecuencias exactas | B o AUTO de la API compacta. | Verificar que las cantidades suman `n`. |
+| Investigar prefijos y rangos locales | C explícita. | Medir frente a A/B, incluyendo memoria y movimiento de datos. |
+| Comparar Java puro y JNI | Elegir explícitamente la API de cada ruta. | Incluir copias JNI, calentamiento JVM y costo total de la llamada. |
+
+A tiene una estructura de fusión con cota general `O(n log n)` y almacenamiento
+auxiliar lineal. B conserva ese peor caso cuando casi no hay repetidos; compactar
+puede reducir el trabajo de fases posteriores, pero la salida completa siempre
+requiere escribir `n` valores. No se atribuye a C una mejora asintótica demostrada
+frente a A/B. Los modelos de tiempo son empíricos, no pruebas de complejidad.
+
+La separación de rangos evita comparaciones, no necesariamente copias. Para dos
+millones de enteros de 32 bits, cada arreglo ocupa 8.000.000 bytes sin contar
+overhead. Entrada, salida, estructuras auxiliares y copias JNI deben considerarse
+por separado al interpretar memoria y rendimiento.
 
 ## 3. Arquitectura y componentes
 
@@ -89,6 +182,183 @@ Los buffers son propiedad del llamador; entrada y salida no deben solaparse.
 El límite auxiliar predeterminado es 256 MiB y no incluye los buffers del
 llamador ni toda la memoria del proceso. La salida compacta admite B/C y
 AUTO selecciona B. Contratos completos: [LIBRARY.md](LIBRARY.md).
+
+### 3.1. Responsabilidades del diseño
+
+La fachada valida argumentos y expone resultados; las estrategias ejecutan A/B/C;
+la política selecciona una estrategia cuando se solicita AUTO. En C, el registro
+es una tabla constante de punteros a funciones. En Java, interfaces internas y un
+registro inmutable separan las capacidades de ordenar y producir frecuencias.
+
+Los buffers y árboles son propios de cada llamada. El puente JNI copia datos
+entre Java y C y usa la fachada pública C. No modifica el core de Java ni requiere
+una JVM personalizada. La implementación y los experimentos tienen rutas distintas
+para que un benchmark histórico no cambie el algoritmo distribuido.
+
+### 3.2. Uso de la API C
+
+Ejemplo completo con estrategia B explícita y ambas salidas:
+
+```c
+#include <tspr3/tspr3.h>
+#include <inttypes.h>
+#include <stdio.h>
+
+int main(void) {
+    const int32_t input[] = {9,8,9,15,12,13,8,8,9};
+    const size_t n = sizeof input / sizeof input[0];
+    int32_t sorted[9];
+    tspr3_frequency_i32 counts[9];
+    size_t used = 0;
+    tspr3_options options;
+    tspr3_report report;
+    tspr3_options_init(&options);
+    options.algorithm = TSPR3_ALGORITHM_B;
+
+    tspr3_result status = tspr3_sort_i32(input, n, sorted, &options, &report);
+    if (status != TSPR3_SUCCESS) {
+        fprintf(stderr, "%s\n", tspr3_result_message(status));
+        return 1;
+    }
+    for (size_t i = 0; i < n; ++i) printf("%" PRId32 " ", sorted[i]);
+    puts("");
+
+    status = tspr3_counts_i32(input, n, counts, &used, &options, NULL);
+    if (status != TSPR3_SUCCESS) {
+        fprintf(stderr, "%s\n", tspr3_result_message(status));
+        return 1;
+    }
+    for (size_t i = 0; i < used; ++i)
+        printf("(%" PRId32 ",%zu) ", counts[i].value, counts[i].count);
+    puts("");
+    return 0;
+}
+```
+
+El llamador reserva `n` enteros para ordenar o `n` registros para frecuencias;
+la API compacta indica cuántos registros se utilizaron. No libera ni transfiere
+la propiedad de esos buffers. Para `n == 0` se permiten punteros de datos nulos;
+para entradas no vacías deben ser válidos y estar separados de la salida.
+`report` es opcional; ofrece estrategia seleccionada, contadores y diagnósticos.
+Sus predicciones y contadores no son un cronómetro de la llamada.
+
+### 3.3. Uso de la API C++17
+
+```cpp
+#include <tspr3/tspr3.hpp>
+#include <iostream>
+
+int main() {
+    try {
+        const std::vector<int32_t> input{9,8,9,15,12,13,8,8,9};
+        auto options = tspr3::default_options();
+        options.algorithm = TSPR3_ALGORITHM_B;
+        const auto sorted = tspr3::sort(input, options);
+        const auto counts = tspr3::frequencies(input, options);
+        for (const auto value : sorted.values) std::cout << value << ' ';
+        std::cout << '\n';
+        for (const auto &item : counts.values)
+            std::cout << '(' << item.value << ',' << item.count << ") ";
+        std::cout << '\n';
+    } catch (const std::exception &error) {
+        std::cerr << error.what() << '\n';
+        return 1;
+    }
+}
+```
+
+Los vectores gestionan memoria. Los errores C se traducen a excepciones C++:
+`invalid_argument`, `bad_alloc` o `length_error`, según la causa. Ambos resultados
+incluyen `diagnostics` para consultar el informe de la operación.
+
+Después de instalar el paquete, un consumidor CMake puede enlazarlo así:
+
+```cmake
+cmake_minimum_required(VERSION 3.20)
+project(mi_app LANGUAGES CXX)
+find_package(TSPR3 0.1 CONFIG REQUIRED)
+add_executable(mi_app main.cpp)
+target_compile_features(mi_app PRIVATE cxx_std_17)
+target_link_libraries(mi_app PRIVATE TSPR3::tspr3)
+```
+
+Indica la carpeta del paquete mediante `CMAKE_PREFIX_PATH`. El archivo `tspr3.lib`
+publicado se construyó con MSVC y runtime `/MD`; usa un toolchain y runtime
+compatibles. Para otras plataformas, construye desde fuentes y valida el resultado.
+
+### 3.4. Uso Java y JAR
+
+```java
+import java.util.Arrays;
+import org.tspr3.Tspr3;
+
+public class Demo {
+    public static void main(String[] args) {
+        int[] input = {9,8,9,15,12,13,8,8,9};
+        int[] sorted = Tspr3.sort(input, Tspr3.Algorithm.B);
+        System.out.println(Arrays.toString(sorted));
+        Tspr3.Frequencies counts = Tspr3.frequencies(input);
+        for (int i = 0; i < counts.values.length; i++)
+            System.out.print("(" + counts.values[i] + "," + counts.counts[i] + ") ");
+        System.out.println();
+    }
+}
+```
+
+Antes de confirmar disponibilidad en Central, descarga el JAR de Releases o
+constrúyelo localmente. En PowerShell, con `Demo.java` en la carpeta actual:
+
+```powershell
+javac -cp .\dist\tspr3-java-0.1.0.jar Demo.java
+java -cp '.;.\dist\tspr3-java-0.1.0.jar' Demo
+```
+
+Los argumentos nulos producen `NullPointerException`. Pedir frecuencias con
+la estrategia A produce `IllegalArgumentException`. La salida usa arreglos nuevos;
+los arreglos `values` y `counts` son propiedad del consumidor y se pueden modificar.
+La biblioteca no promete una estructura de resultado inmutable.
+
+### 3.5. JNI opcional
+
+Para invocar C desde Java, cambia la llamada de ordenamiento por:
+
+```java
+int[] sorted = org.tspr3.NativeTspr3.sort(input, Tspr3.Algorithm.B);
+```
+
+La DLL `tspr3_jni.dll` debe estar disponible en el directorio indicado al iniciar
+la JVM; por ejemplo, con los archivos construidos en este repositorio:
+
+```powershell
+java '-Djava.library.path=dist\java-native' -cp '.;dist\tspr3-java-0.1.0.jar' Demo
+```
+
+JVM y DLL deben tener una arquitectura compatible. Java puro no carga la DLL.
+La ruta JNI no sustituye silenciosamente una llamada a `Tspr3.sort`; el consumidor
+la solicita mediante `NativeTspr3`. Incluye copias de transferencia y el límite
+de heap auxiliar C no representa el consumo total de la JVM.
+
+### 3.6. Resultados esperados y verificación
+
+Los ejemplos anteriores producen:
+
+```text
+Orden:       8 8 8 9 9 9 12 13 15
+Frecuencias: (8,3) (9,3) (12,1) (13,1) (15,1)
+```
+
+Las pruebas comprueban orden ascendente, conservación del multiconjunto,
+cantidades exactas y entrada preservada. También cubren extremos del dominio,
+arreglos vacíos, duplicados, casos aleatorios y contratos de argumentos.
+La política AUTO se verifica por separado de la corrección de cada estrategia.
+
+### 3.7. Extensión futura a estructuras
+
+La siguiente API deberá separar registro y clave: extraer una clave ordenable,
+devolver una permutación o mover registros completos, definir estabilidad entre
+claves iguales y conservar payload e identidad. Dos registros con la misma clave
+no se sustituyen por un único registro con cantidad. Las frecuencias pueden
+describir el grupo, pero no reemplazar su contenido. Esta etapa no está implementada.
 
 ## 4. Actores y responsabilidades
 
