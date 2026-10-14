@@ -292,19 +292,29 @@ el commit y los hashes de cada distribución.
 | Release y archivos descargables | Publicados; seis adjuntos, incluidos checksums. |
 | Namespace Sonatype | Verified según confirmación del propietario. |
 | Validación local de metadata de publicación | Aprobada. |
-| Firma y token | Pendientes de configuración por el propietario. |
-| Deployment y publicación en Maven Central | Pendientes. |
+| Clave pública GPG | Publicada en keyserver.ubuntu.com y descargada para comprobar su huella. |
+| Firmas del JAR, fuentes, Javadoc y POM | Verificadas localmente: cuatro firmas válidas. |
+| Token de publicación | Creación confirmada por el propietario; no se registra su contenido. |
+| Bundle de Central | Generado localmente y revisado; coincide con los artefactos firmados. |
+| Deployment en el Portal | Estado remoto todavía no inspeccionado. |
+| Publicación en Maven Central | No confirmada: la consulta del POM público devolvió HTTP 404. |
 | Registros genéricos, Conan/vcpkg y Linux/macOS | Etapas futuras. |
 
-La comprobación de credenciales durante esta preparación no encontró una clave
-privada GPG ni variables de token disponibles en la sesión del agente. Esto
-describe esa sesión y momento; no determina si el propietario las configuró
-posteriormente en otra terminal.
+Se resolvió un fallo de `keyboxd` del GPG incluido en Git preparando un almacén
+exclusivo para TSPR3. La clave se generó posteriormente y su parte pública se
+publicó. La contraseña y el token se introducen localmente con entrada oculta
+mediante `scripts/publish-central.ps1`; no se incluyen en los paquetes.
+
+La revisión del bundle no encontró imágenes, scripts de PowerShell, claves
+privadas ni credenciales. Incluye JAR, fuentes, Javadoc y POM con firmas y
+checksums. El nombre de autoría es público y la clave GPG pública identifica
+al firmante. La revisión no constituye una garantía absoluta de ausencia de errores.
 
 Las evidencias locales incluyen cuatro suites CTest, 90.399 entradas del núcleo,
 23.352 entradas Java y pruebas adicionales Java/JNI con tres entradas de dos
 millones. Detalles y reproducción: [VALIDATION.md](VALIDATION.md).
 
-El siguiente recorrido operativo es: crear la clave protegida, publicar su clave
-pública, generar el token, firmar y enviar, revisar la validación en Sonatype,
-publicar y comprobar la resolución desde un proyecto independiente.
+El siguiente recorrido operativo es comprobar el deployment en Sonatype,
+resolver cualquier error de validación, publicar y comprobar la resolución
+desde un proyecto independiente. Un HTTP 404 en el repositorio público no
+determina por sí solo si existe un deployment pendiente dentro del Portal.

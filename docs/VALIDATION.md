@@ -31,7 +31,11 @@ Java/JNI y Maven. [Run del commit de v0.1.0](https://github.com/theforgotten-dev
 No se declara validación Linux/macOS.
 
 El perfil `central-release validate` aprobó después de definir Apache-2.0 y
-registrar el namespace Verified confirmado por el propietario. No se ejecutó
-`central-release deploy` ni se publicaron componentes en Central. El código y
-los paquetes están disponibles en GitHub Releases. Estado completo:
+registrar el namespace Verified confirmado por el propietario. Posteriormente
+se generó el bundle de publicación y se verificaron las cuatro firmas de JAR,
+fuentes, Javadoc y POM. El bundle coincide con los artefactos locales revisados.
+No se ha confirmado la disponibilidad pública en Central; la consulta del POM
+de 0.1.0 devolvió HTTP 404 el 14 de octubre de 2026. El estado del deployment
+en el Portal requiere una comprobación independiente. El código y los paquetes
+están disponibles en GitHub Releases. Estado completo:
 [PROYECTO-Y-DESPLIEGUE.md](PROYECTO-Y-DESPLIEGUE.md).

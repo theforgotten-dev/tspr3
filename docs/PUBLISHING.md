@@ -28,9 +28,12 @@ Artefactos en `java/target`:
 Maven ejecuta las 23.352 entradas de prueba reales, no se limita a un resultado
 de Surefire sin pruebas. El perfil normal no firma ni sube archivos.
 
-## Requisitos pendientes del propietario
+## Estado de preparación
 
-1. Disponer de una clave GPG y un token de publicación de Central.
+La clave GPG ya se generó y su parte pública está publicada. Se verificaron
+las firmas del JAR, fuentes, Javadoc y POM. El propietario confirmó la creación
+del token. El bundle local se revisó y no incluye claves privadas ni credenciales.
+Falta comprobar el deployment en el Portal y su publicación efectiva en Central.
 
 La licencia Apache-2.0 fue elegida por el propietario y está incluida en
 el repositorio, el paquete C/C++ y el JAR Java.
@@ -59,14 +62,13 @@ Ejemplo para ejecutar únicamente después de completar esos requisitos:
 ```powershell
 .\scripts\build-maven.ps1 -Goals @(
   '-Pcentral-release',
-  '-Dtspr3.license.name=LICENCIA_ELEGIDA',
-  '-Dtspr3.license.url=https://URL_REAL_DE_LICENCIA',
-  '-Dtspr3.namespace.verified=true',
   'deploy'
 )
 ```
 
 Los nombres del token son `CENTRAL_TOKEN_USERNAME` y `CENTRAL_TOKEN_PASSWORD`.
-El GPG instalado y sus credenciales se administran fuera del repositorio. El
-perfil de publicación no se ejecutó: los artefactos locales están separados de
-una publicación efectivamente disponible en Central.
+El GPG instalado y sus credenciales se administran fuera del repositorio.
+Para el almacén y la clave configurados, usa `scripts/publish-central.ps1`,
+que solicita secretos con entrada oculta y configura la ruta de GPG.
+Los artefactos firmados locales no acreditan por sí solos la publicación:
+la consulta del POM público de 0.1.0 devolvió HTTP 404 el 14 de octubre de 2026.
