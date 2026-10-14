@@ -46,6 +46,8 @@ ningún token ni contraseña se guarda en el repositorio.
 
 ## Flujo de publicación preparado
 
+Para configurar la clave y el token localmente, sigue [MAVEN-SETUP.md](MAVEN-SETUP.md).
+
 El perfil `central-release` comprueba licencia y namespace antes de firmar.
 `maven-gpg-plugin` firma en verify; `central-publishing-maven-plugin` sube un
 bundle en deploy, genera checksums y tiene `autoPublish=false`. Por tanto, el
