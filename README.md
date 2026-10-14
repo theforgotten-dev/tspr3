@@ -77,7 +77,7 @@ int[] sorted = Tspr3.sort(input);
 
 El JAR puede usarse directamente. Las coordenadas preparadas para Central son
 `io.github.theforgotten-dev:tspr3:0.1.0`, pero todavia no estan publicadas.
-Faltan namespace verificado en Sonatype y firma/token.
+El propietario confirmó el namespace verificado en Sonatype. Faltan firma/token.
 
 ## Licencia
 

@@ -13,7 +13,7 @@
     <tspr3.repository.url>https://github.com/theforgotten-dev/tspr3</tspr3.repository.url>
     <tspr3.license.name>Apache License, Version 2.0</tspr3.license.name>
     <tspr3.license.url>https://www.apache.org/licenses/LICENSE-2.0</tspr3.license.url>
-    <tspr3.namespace.verified>false</tspr3.namespace.verified>
+    <tspr3.namespace.verified>true</tspr3.namespace.verified>
   </properties>
   <licenses><license><name>${tspr3.license.name}</name><url>${tspr3.license.url}</url></license></licenses>
   <developers><developer><id>theforgotten-dev</id><name>theforgotten-dev</name><url>https://github.com/theforgotten-dev</url></developer></developers>

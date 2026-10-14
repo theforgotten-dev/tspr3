@@ -2,7 +2,8 @@
 
 Coordenadas preparadas: `io.github.theforgotten-dev:tspr3:0.1.0`.
 El usuario GitHub activo se verificó con `gh api user`. Esto no equivale a una
-verificación del namespace en Sonatype. La URL `theforgotten-dev/tspr3` del POM
+verificación del namespace en Sonatype. El propietario confirmó su estado
+Verified el 14 de octubre de 2026. La URL `theforgotten-dev/tspr3` del POM
 es el repositorio público que aloja ambas bibliotecas.
 
 ## Construcción local verificable
@@ -29,8 +30,7 @@ de Surefire sin pruebas. El perfil normal no firma ni sube archivos.
 
 ## Requisitos pendientes del propietario
 
-1. Registrar la cuenta y verificar el namespace en Sonatype Central.
-2. Disponer de una clave GPG y un token de publicación de Central.
+1. Disponer de una clave GPG y un token de publicación de Central.
 
 La licencia Apache-2.0 fue elegida por el propietario y está incluida en
 el repositorio, el paquete C/C++ y el JAR Java.
