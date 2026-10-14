@@ -11,12 +11,14 @@ Abre PowerShell en el repositorio y ejecuta:
 ```powershell
 Set-Location E:\proys\algoritmoOrdenamiento
 $tspr3Gpg = 'C:\Program Files\Git\usr\bin\gpg.exe'
-$env:GNUPGHOME = Join-Path $env:USERPROFILE '.tspr3-gnupg'
-New-Item -ItemType Directory -Path $env:GNUPGHOME -Force | Out-Null
-$tspr3Common = Join-Path $env:GNUPGHOME 'common.conf'
+$tspr3KeyHome = Join-Path $env:USERPROFILE '.tspr3-gnupg'
+New-Item -ItemType Directory -Path $tspr3KeyHome -Force | Out-Null
+$tspr3Common = Join-Path $tspr3KeyHome 'common.conf'
 if (!(Test-Path -LiteralPath $tspr3Common)) {
     Set-Content -LiteralPath $tspr3Common -Value '# File keyring for TSPR3; no keyboxd' -Encoding ASCII
 }
+$tspr3Drive = $tspr3KeyHome.Substring(0,1).ToLowerInvariant()
+$env:GNUPGHOME = '/' + $tspr3Drive + $tspr3KeyHome.Substring(2).Replace('\','/')
 & $tspr3Gpg --full-generate-key
 ```
 
@@ -27,6 +29,8 @@ clave y del certificado de revocación fuera del repositorio.
 
 Este directorio es exclusivo para TSPR3 y no cambia el directorio GPG general.
 Reestablece `GNUPGHOME` con la misma ruta si abres otra sesión para firmar.
+El GPG de Git usa rutas MSYS como `/c/Users/juan/.tspr3-gnupg`; el bloque
+convierte la ruta Windows antes de entregársela al ejecutable.
 Se usa un `common.conf` sin `use-keyboxd`: el GPG incluido en Git puede fallar
 si intenta iniciar `/usr/lib/gnupg/keyboxd`, que no está instalado. Esta
 preparación permite usar el almacén de archivos; no borra ni migra claves
