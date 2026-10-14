@@ -11,6 +11,12 @@ Abre PowerShell en el repositorio y ejecuta:
 ```powershell
 Set-Location E:\proys\algoritmoOrdenamiento
 $tspr3Gpg = 'C:\Program Files\Git\usr\bin\gpg.exe'
+$env:GNUPGHOME = Join-Path $env:USERPROFILE '.tspr3-gnupg'
+New-Item -ItemType Directory -Path $env:GNUPGHOME -Force | Out-Null
+$tspr3Common = Join-Path $env:GNUPGHOME 'common.conf'
+if (!(Test-Path -LiteralPath $tspr3Common)) {
+    Set-Content -LiteralPath $tspr3Common -Value '# File keyring for TSPR3; no keyboxd' -Encoding ASCII
+}
 & $tspr3Gpg --full-generate-key
 ```
 
@@ -18,6 +24,14 @@ Elige RSA y RSA, 4096 bits, una validez de 2 años, tu nombre y el correo
 que quieras asociar públicamente a las firmas. Introduce una contraseña
 segura en el diálogo de GPG. Conserva una copia privada de respaldo de tu
 clave y del certificado de revocación fuera del repositorio.
+
+Este directorio es exclusivo para TSPR3 y no cambia el directorio GPG general.
+Reestablece `GNUPGHOME` con la misma ruta si abres otra sesión para firmar.
+Se usa un `common.conf` sin `use-keyboxd`: el GPG incluido en Git puede fallar
+si intenta iniciar `/usr/lib/gnupg/keyboxd`, que no está instalado. Esta
+preparación permite usar el almacén de archivos; no borra ni migra claves
+existentes. La consulta de claves con este directorio se verificó localmente.
+Véase [configuración GnuPG](https://gnupg.org/documentation/manuals/gnupg/GPG-Configuration.html).
 
 Obtén la huella completa y publica únicamente la clave pública:
 

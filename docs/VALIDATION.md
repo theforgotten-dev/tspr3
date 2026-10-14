@@ -24,6 +24,14 @@ Los comandos de reproducción son:
 .\build.ps1 -Task tri -Sanitize
 ```
 
-CI Windows está preparada en `.github/workflows/ci.yml`; no se ejecutó aún en
-GitHub porque no existe un remoto publicado. No se declara validación Linux/macOS.
-El perfil `central-release` no se ejecutó ni se publicaron componentes en Central.
+CI Windows está publicada en `.github/workflows/ci.yml` y se ejecutó en GitHub.
+El primer run falló al solicitar Visual Studio 2022 sobre `windows-latest`.
+Se fijó el runner a `windows-2022`; las ejecuciones posteriores aprobaron C/C++,
+Java/JNI y Maven. [Run del commit de v0.1.0](https://github.com/theforgotten-dev/tspr3/actions/runs/38603341161).
+No se declara validación Linux/macOS.
+
+El perfil `central-release validate` aprobó después de definir Apache-2.0 y
+registrar el namespace Verified confirmado por el propietario. No se ejecutó
+`central-release deploy` ni se publicaron componentes en Central. El código y
+los paquetes están disponibles en GitHub Releases. Estado completo:
+[PROYECTO-Y-DESPLIEGUE.md](PROYECTO-Y-DESPLIEGUE.md).

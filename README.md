@@ -50,6 +50,8 @@ docs/               Arquitectura, contratos y publicacion
 
 ## Documentacion
 
+- [Proyecto completo, actores y etapas de despliegue](docs/PROYECTO-Y-DESPLIEGUE.md).
+
 - [Arquitectura: Facade, Strategy y Policy](docs/ARCHITECTURE.md).
 - [Uso de la biblioteca C/C++](docs/LIBRARY.md).
 - [Uso del JAR y JNI](java/README.md).
