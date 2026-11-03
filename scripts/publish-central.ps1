@@ -1,4 +1,4 @@
-param([switch]$CheckOnly)
+param([switch]$CheckOnly, [switch]$RefreshToken)
 $ErrorActionPreference = 'Stop'
 $tspr3Gpg = 'C:\Program Files\Git\usr\bin\gpg.exe'
 $tspr3Fingerprint = '3DA8BCEF0D9A7CADEE2390E1E7E1DFF927C45BD3'
@@ -18,6 +18,11 @@ try {
         & "$PSScriptRoot\build-maven.ps1" -Goals @('-Pcentral-release','validate')
         return
     }
+    if ($RefreshToken) {
+        [Environment]::SetEnvironmentVariable('CENTRAL_TOKEN_USERNAME',$null,'Process')
+        [Environment]::SetEnvironmentVariable('CENTRAL_TOKEN_PASSWORD',$null,'Process')
+    }
+    Write-Host 'Usa el username y password generados del User Token de Central; no el login de GitHub ni su contrasena.'
     foreach ($item in @(
         @{Name='CENTRAL_TOKEN_USERNAME';Prompt='Token username de Sonatype'},
         @{Name='CENTRAL_TOKEN_PASSWORD';Prompt='Token password de Sonatype'},
@@ -36,7 +41,7 @@ try {
     }
     & "$PSScriptRoot\build-maven.ps1" -Goals @(
         '-Pcentral-release', "-Dgpg.executable=$tspr3Gpg",
-        "-Dgpg.keyname=$tspr3Fingerprint", 'deploy'
+        "-Dgpg.keyname=$tspr3Fingerprint", '-e', 'deploy'
     )
     Write-Host 'Subida completada. Revisa el deployment en Sonatype Central antes de publicarlo.'
 } finally {

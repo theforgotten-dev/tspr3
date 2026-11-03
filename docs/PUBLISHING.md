@@ -85,8 +85,22 @@ el metadata publico confirma 0.1.0 como ultima version el 3 de noviembre de 2026
 ## Diagnostico del intento 0.1.1
 
 El intento del 3 de noviembre genero el bundle y las cuatro firmas GPG validas,
-pero el plugin devolvio un fallo de deployment. Falta la respuesta anterior del
-servidor para determinar el motivo exacto. No se considera publicada la version.
+pero la subida fue rechazada con HTTP 401: el servidor no acepto la autenticacion.
+No fue un rechazo de validacion del ZIP. No se considera publicada la version.
+El server id `central-publisher` coincide entre el POM y la plantilla settings.
+Se necesita el par username/password generado por un User Token de Central,
+no las credenciales de GitHub ni la contrasena GPG. Si el token no se conserva
+o dejo de ser valido, generar otro en https://central.sonatype.com/usertoken.
+
+Para volver a introducir ambos valores, ignorando los heredados del entorno:
+
+```powershell
+.\scripts\publish-central.ps1 -RefreshToken
+```
+
+Los secretos se solicitan con entrada oculta y no se escriben a archivos.
+El entorno previo se restaura al finalizar. `-CheckOnly` valida metadatos y
+disponibilidad de clave; no comprueba autenticacion con Sonatype.
 
 El ZIP generado en Windows contiene rutas internas con barras invertidas.
 Para crear una copia con separadores `/`, sin cambiar ningun archivo firmado:
