@@ -112,3 +112,13 @@ Para crear una copia con separadores `/`, sin cambiar ningun archivo firmado:
 El script conserva el original y compara por SHA-256 cada entrada de ambos ZIP.
 La copia queda en `dist/tspr3-0.1.1-central.zip`, ignorada por Git, y puede
 subirse manualmente en el Portal. No sustituye la revision del error del servidor.
+
+## Deployment de 0.1.1 aceptado - 3 de noviembre de 2026
+
+La subida posterior termino con BUILD SUCCESS y validacion correcta.
+Deployment: eba7b283-aa94-4638-b747-a62365ba54ea.
+La API acepto la orden de publicar con HTTP 204; ultimo estado consultado:
+PUBLISHING. La descarga publica todavia no estaba disponible al comprobarla.
+El ZIP original generado por el plugin fue aceptado: la conversion de rutas
+no fue necesaria para este deployment. El rechazo anterior fue HTTP 401.
+No se guardaron credenciales en archivos del proyecto.
