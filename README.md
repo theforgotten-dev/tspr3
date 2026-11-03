@@ -85,6 +85,11 @@ no debe considerarse publicada hasta verificar su disponibilidad en Central.
 El paquete Java sigue siendo `org.tspr3`, independiente del groupId.
 Consulta [el flujo de publicacion](docs/PUBLISHING.md).
 
+## Pipeline local
+
+Webhook autenticado, incremento de version, validacion y publicacion con
+sincronizacion atomica de commit/tag: [guia del pipeline](docs/LOCAL-PIPELINE.md).
+
 ## Licencia
 
 Ambas bibliotecas se distribuyen bajo [Apache-2.0](LICENSE).

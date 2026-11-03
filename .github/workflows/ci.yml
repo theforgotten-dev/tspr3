@@ -5,6 +5,12 @@ jobs:
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Local release webhook contracts
+        shell: powershell
+        run: node --test tests/release/pipeline.test.mjs
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
