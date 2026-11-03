@@ -1,26 +1,45 @@
 name: Library contracts
-on: [push, pull_request]
+on:
+  push:
+  pull_request:
+permissions:
+  contents: read
 jobs:
   windows:
+    name: Windows contracts
     runs-on: windows-2022
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - name: Local release webhook contracts
-        shell: powershell
-        run: node --test tests/release/pipeline.test.mjs
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '21'
+      - name: Release webhook contracts
+        shell: powershell
+        run: node --test tests/release/pipeline.test.mjs
       - name: C and C++ package contracts
         shell: powershell
         run: .\build.ps1 -Task c
       - name: Java and JNI contracts
         shell: powershell
         run: .\build.ps1 -Task java -Native
-      - name: Maven sources and Javadoc
+      - name: Maven, sources, Javadoc and SBOM
         shell: powershell
         run: .\build.ps1 -Task maven
+  linux:
+    name: Linux contracts and sanitizers
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure with ASan and UBSan
+        run: cmake -S . -B build/linux -DCMAKE_BUILD_TYPE=Debug -DTSPR3_BUILD_EXAMPLES=ON -DCMAKE_C_FLAGS='-fsanitize=address,undefined -fno-omit-frame-pointer' -DCMAKE_CXX_FLAGS='-fsanitize=address,undefined -fno-omit-frame-pointer'
+      - name: Build
+        run: cmake --build build/linux --parallel
+      - name: Test
+        env:
+          ASAN_OPTIONS: detect_leaks=1:halt_on_error=1
+          UBSAN_OPTIONS: halt_on_error=1:print_stacktrace=1
+        run: ctest --test-dir build/linux --output-on-failure

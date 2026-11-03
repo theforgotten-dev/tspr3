@@ -79,14 +79,14 @@ No pegues secretos en el chat ni los guardes en archivos versionados.
 .\scripts\publish-central.ps1
 ```
 
-Los artefactos firmados locales no acreditan por sí solos la publicación:
-el metadata publico confirma 0.1.0 como ultima version el 3 de noviembre de 2026.
+Los artefactos firmados locales no acreditan por sí solos la publicación.
+El metadata publico confirma 0.1.1 como ultima version el 3 de noviembre de 2026.
 
-## Diagnostico del intento 0.1.1
+## Historial del intento 0.1.1
 
 El intento del 3 de noviembre genero el bundle y las cuatro firmas GPG validas,
 pero la subida fue rechazada con HTTP 401: el servidor no acepto la autenticacion.
-No fue un rechazo de validacion del ZIP. No se considera publicada la version.
+No fue un rechazo de validacion del ZIP. Un segundo intento fue exitoso.
 El server id `central-publisher` coincide entre el POM y la plantilla settings.
 Se necesita el par username/password generado por un User Token de Central,
 no las credenciales de GitHub ni la contrasena GPG. Si el token no se conserva
@@ -117,8 +117,8 @@ subirse manualmente en el Portal. No sustituye la revision del error del servido
 
 La subida posterior termino con BUILD SUCCESS y validacion correcta.
 Deployment: eba7b283-aa94-4638-b747-a62365ba54ea.
-La API acepto la orden de publicar con HTTP 204; ultimo estado consultado:
-PUBLISHING. La descarga publica todavia no estaba disponible al comprobarla.
+La API acepto la orden de publicar con HTTP 204. Posteriormente el metadata y
+el POM publico confirmaron 0.1.1 como version `PUBLISHED` y consumible.
 El ZIP original generado por el plugin fue aceptado: la conversion de rutas
 no fue necesaria para este deployment. El rechazo anterior fue HTTP 401.
 No se guardaron credenciales en archivos del proyecto.

@@ -26,6 +26,7 @@ export async function createPipeline({secret, directory, runner, allowPublish = 
   await lock.writeFile(String(process.pid));
   let busy = false;
   let activeTask = Promise.resolve();
+  let authWindow = Date.now(), authFailures = 0;
   const server = http.createServer(async (req, res) => {
     const reply = (code, data) => { res.writeHead(code, {'content-type': 'application/json'}); res.end(JSON.stringify(data)); };
     try {
@@ -45,7 +46,9 @@ export async function createPipeline({secret, directory, runner, allowPublish = 
       const body = Buffer.concat(chunks);
       // Sign method and URL as well as body, so a signature cannot be reused for another operation.
       const signed = Buffer.concat([Buffer.from(req.method + ' ' + req.url + '\n'), body]);
-      if (!authenticate(secret, signed, req.headers['x-tspr3-timestamp'], req.headers['x-tspr3-signature'])) { reply(401, {error: 'Unauthorized'}); return; }
+      if (Date.now() - authWindow > 60_000) { authWindow = Date.now(); authFailures = 0; }
+      if (authFailures >= 20) { reply(429, {error: 'Too many authentication failures'}); return; }
+      if (!authenticate(secret, signed, req.headers['x-tspr3-timestamp'], req.headers['x-tspr3-signature'])) { authFailures++; reply(401, {error: 'Unauthorized'}); return; }
       const match = /^\/jobs\/([a-zA-Z0-9-]{8,64})$/.exec(req.url);
       if (req.method === 'GET' && match) {
         try { reply(200, JSON.parse(await readFile(path.join(directory, match[1] + '.json'), 'utf8'))); }
@@ -88,12 +91,11 @@ if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.me
   const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
   const runner = async job => {
     const log = await open(path.join(directory, job.id + '.log'), 'a');
-    const secrets = ['CENTRAL_TOKEN_USERNAME', 'CENTRAL_TOKEN_PASSWORD', 'MAVEN_GPG_PASSPHRASE'];
-    if (job.mode === 'publish' && secrets.some(name => !process.env[name])) { await log.close(); throw Error('Missing publication secrets'); }
+    const secretsFile = path.join(directory, 'release-secrets.json');
     try {
       await new Promise((resolve, reject) => {
         const child = spawn('powershell.exe', ['-NoProfile', '-NonInteractive', '-File', path.join(root, 'scripts/release/run.ps1'),
-          '-JobId', job.id, '-Bump', job.bump, '-Mode', job.mode, '-StateDirectory', directory],
+          '-JobId', job.id, '-Bump', job.bump, '-Mode', job.mode, '-StateDirectory', directory, '-SecretsFile', secretsFile],
           {cwd: root, windowsHide: true, stdio: ['ignore', log.fd, log.fd]});
         child.on('error', reject);
         child.on('exit', code => code === 0 ? resolve() : reject(Error('Release failed')));

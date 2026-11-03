@@ -1,0 +1,47 @@
+name: Release artifacts
+on:
+  push:
+    tags: ['v*.*.*']
+permissions:
+  contents: write
+  id-token: write
+  attestations: write
+jobs:
+  release:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Verify tag and build Maven artifacts
+        shell: powershell
+        run: |
+          $expected='${{ github.ref_name }}'.Substring(1)
+          [xml]$pom=Get-Content java\pom.xml
+          if([string]$pom.project.version -ne $expected) { throw 'Tag and POM version differ.' }
+          .\scripts\build-maven.ps1 -Goals @('clean','verify')
+      - name: Checksums
+        shell: powershell
+        run: |
+          New-Item -ItemType Directory -Path dist -Force | Out-Null
+          Get-ChildItem java\target\tspr3-* -File | Where-Object Extension -in '.jar','.json','.xml' | ForEach-Object {
+            '{0}  {1}' -f (Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLowerInvariant(),$_.Name
+          } | Set-Content dist\SHA256SUMS.txt -Encoding ASCII
+      - uses: actions/attest-build-provenance@v2
+        with:
+          subject-path: |
+            java/target/tspr3-*.jar
+            java/target/bom.json
+            java/target/bom.xml
+      - name: Create GitHub release
+        shell: powershell
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $assets=@(Get-ChildItem java\target\tspr3-*.jar | ForEach-Object FullName)
+          $assets+=(Resolve-Path java\target\bom.json).Path
+          $assets+=(Resolve-Path java\target\bom.xml).Path
+          $assets+=(Resolve-Path dist\SHA256SUMS.txt).Path
+          gh release create '${{ github.ref_name }}' @assets --verify-tag --generate-notes --title "TSPR3 ${{ github.ref_name }} (experimental)"

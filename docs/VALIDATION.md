@@ -28,16 +28,16 @@ CI Windows está publicada en `.github/workflows/ci.yml` y se ejecutó en GitHub
 El primer run falló al solicitar Visual Studio 2022 sobre `windows-latest`.
 Se fijó el runner a `windows-2022`; las ejecuciones posteriores aprobaron C/C++,
 Java/JNI y Maven. [Run del commit de v0.1.0](https://github.com/theforgotten-dev/tspr3/actions/runs/38603341161).
-No se declara validación Linux/macOS.
+CI valida Windows/MSVC y Linux/GCC con AddressSanitizer y UndefinedBehaviorSanitizer.
+No se declara validación macOS.
 
 El perfil `central-release validate` aprobó después de definir Apache-2.0 y
 registrar el namespace Verified confirmado por el propietario. Posteriormente
 se generó el bundle de publicación y se verificaron las cuatro firmas de JAR,
 fuentes, Javadoc y POM. El bundle coincide con los artefactos locales revisados.
-No se ha confirmado la disponibilidad pública en Central; la consulta del POM
-de 0.1.0 devolvió HTTP 404 el 14 de octubre de 2026. El estado del deployment
-en el Portal requiere una comprobación independiente. El código y los paquetes
-están disponibles en GitHub Releases. Estado completo:
+Las versiones 0.1.0 y 0.1.1 están disponibles públicamente en Maven Central.
+El metadata y el POM de 0.1.1 devolvieron HTTP 200 el 3 de noviembre de 2026.
+El código y los paquetes también están disponibles en GitHub. Estado completo:
 [PROYECTO-Y-DESPLIEGUE.md](PROYECTO-Y-DESPLIEGUE.md).
 
 ## Revision 0.1.1 - 3 de noviembre de 2026
@@ -49,6 +49,7 @@ están disponibles en GitHub Releases. Estado completo:
 - Las pruebas con AddressSanitizer del nucleo pasaron 90.399 entradas durante
   la revision previa al cambio de version; el algoritmo no se modifico.
 - Los benchmarks grandes no se repitieron: sus tiempos siguen siendo historicos.
-- 0.1.0 confirmada en Central; 0.1.1 preparada, pendiente de firma y subida.
+- 0.1.1 confirmada en Central; las versiones futuras usan validación previa,
+  tag firmado, publicación explícita, SBOM y verificación del JAR público.
 - build-java.ps1 utiliza JDK 17+ y genera bytecode compatible con Java 8.
   La validacion historica con la JVM Java 8 se conserva arriba.

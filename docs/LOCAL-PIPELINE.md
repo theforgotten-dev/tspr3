@@ -1,8 +1,8 @@
 # Pipeline local de releases
 
 Requiere Windows, Node 24+, Git autenticado para push, MSVC 2022 y JDK 17+.
-La clave GPG existente permanece fuera del repositorio. Introducir credenciales
-nuevas en la consola; reemplazar los secretos expuestos en el chat.
+La clave GPG existente permanece fuera del repositorio. El token y la passphrase
+se cifran mediante DPAPI para el usuario Windows actual, fuera del checkout.
 
 ## Arranque y prueba sin publicar
 
@@ -24,12 +24,14 @@ La pagina `http://127.0.0.1:8787/` muestra estado y bloqueo de publicacion;
 Para habilitar publicaciones, detener primero la instancia anterior y arrancar:
 
 ```powershell
+.\scripts\release\set-secrets.ps1
 .\scripts\release\start.ps1 -EnablePublish
 node scripts/release/request.mjs publish patch
 ```
 
-Solicita token username, token password y passphrase GPG con entrada oculta.
-Los secretos solo se heredan al servidor y se quitan de la terminal.
+`set-secrets.ps1` solicita token username, token password y passphrase GPG con
+entrada oculta. El servidor no recibe secretos: el worker los descifra solo para
+la fase de firma/publicacion y los elimina de su entorno al finalizar.
 Tambien admite `minor` y `major`. Arrancar no inicia una release.
 
 ## Flujo
@@ -39,9 +41,9 @@ Tambien admite `minor` y `major`. Arrancar no inicia una release.
 3. Rechaza versiones presentes en Central o tags remotos existentes. Un error de red no se interpreta como ausencia.
 4. Ejecuta C/C++, consumidores instalados, Java/JNI y Maven `clean verify`.
 5. En modo `check` termina sin commit, push ni subida a Maven.
-6. En modo `publish` crea commit y tag anotado y sincroniza ambos con push atomico sin force. Una actualizacion concurrente de main rechaza ambos.
-7. Firma y publica en Central con `autoPublish=true` y `waitUntil=published`.
-8. Descarga el JAR publico y compara SHA-256 con el artefacto local.
+6. En modo `publish` crea el commit local y sube a Central sin publicar; espera `VALIDATED` y conserva el deployment ID.
+7. Crea un tag GPG firmado y sincroniza `main` y tag mediante push atomico sin force.
+8. Publica exactamente ese deployment, espera `PUBLISHED` y compara por SHA-256 el JAR publico con el local.
 
 El checkout original y sus archivos sin seguimiento permanecen intactos.
 Los snapshots se conservan para investigar fallos; no hay limpieza automatica.
@@ -63,19 +65,18 @@ timestamp + "." + METHOD + " " + URL + "\n" + BODY
 Acepta cinco minutos de desfase y compara firmas en tiempo constante.
 Un ID repetido devuelve el resultado previo y no repite la release.
 Un job concurrente recibe 409. Publicar sin habilitarlo recibe 403.
+Tras 20 firmas inválidas por minuto, el servidor local responde 429.
 El cliente calcula las firmas; no transmite credenciales Maven.
 No se expone a Internet ni crea tuneles. Un origen remoto requiere configurar
 acceso autenticado adicional: GitHub no puede acceder a localhost directamente.
 
 ## Fallos y recuperacion
 
-No hay reintentos automaticos de publicacion. Despues de `git-synchronized`
-pueden existir commit/tag publicados y Maven pendiente. Consultar log,
-`ID.release.json` y Portal antes de actuar. Entrar al checkout conservado y
-ejecutar `scripts/publish-central.ps1` para terminar la misma version si todavia
-no se subio. Si la subida ya fue aceptada, revisar/publicar ese deployment en
-Central. No volver a subir una version publicada ni generar otra para ocultar
-el fallo. La espera de Central puede terminar por timeout y aun publicarse.
+No hay reintentos automaticos. Si el estado es `central-validated`, Git todavia
+no esta sincronizado. Si es `git-synchronized`, reanudar el mismo deployment con
+`scripts/release/resume.ps1 -DeploymentId UUID`. No volver a subir una version
+publicada ni incrementar para ocultar el fallo. Un timeout puede terminar en
+publicacion; consultar el deployment antes de repetir una operacion.
 
 `server.lock` impide dos servidores en el mismo directorio. Para detener una
 instancia oculta usar `Stop-Process -Id PID`. Antes de borrar manualmente el
@@ -92,3 +93,10 @@ publicacion al arrancar manualmente.
 ```powershell
 node --test tests/release/pipeline.test.mjs
 ```
+
+## Objetivos operacionales
+
+Servicio local, usuario único, una release simultánea. Objetivo de disponibilidad:
+99% durante una sesión manual; p99 menor a 250 ms para dashboard, health y
+aceptación del job (la compilación continúa asíncrona). RPO 0 para transiciones
+persistidas y RTO de 30 minutos usando el checkout, estado y deployment ID.

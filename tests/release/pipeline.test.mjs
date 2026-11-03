@@ -41,6 +41,8 @@ test('authenticated jobs: serialization, replay protection, persistence and publ
       if (JSON.parse(await readFile(path.join(directory, 'release-123.json'))).status === 'succeeded') break;
     }
     assert.equal(JSON.parse(await readFile(path.join(directory, 'release-123.json'))).status, 'succeeded');
+    for (let i = 0; i < 19; i++) assert.equal((await send({...value, id: `invalid-${String(i).padStart(3, '0')}`}, false)).status, 401);
+    assert.equal((await send({...value, id: 'invalid-limit'}, false)).status, 429);
     await assert.rejects(createPipeline({secret, directory, runner: async () => {}}), {code: 'EEXIST'});
   } finally {
     await new Promise(resolve => server.close(resolve));

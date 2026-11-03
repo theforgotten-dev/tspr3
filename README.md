@@ -1,5 +1,9 @@
 # TSPR3
 
+[![Library contracts](https://github.com/theforgotten-dev/tspr3/actions/workflows/ci.yml/badge.svg)](https://github.com/theforgotten-dev/tspr3/actions/workflows/ci.yml)
+[![CodeQL](https://github.com/theforgotten-dev/tspr3/actions/workflows/codeql.yml/badge.svg)](https://github.com/theforgotten-dev/tspr3/actions/workflows/codeql.yml)
+[![Maven Central](https://img.shields.io/maven-central/v/io.github.theforgotten-dev/tspr3)](https://central.sonatype.com/artifact/io.github.theforgotten-dev/tspr3)
+
 Biblioteca experimental de ordenamiento basada en ternas, frecuencias y un indice
 binario de bloques. API C17, adaptador C++17, JAR Java 8 y puente JNI opcional.
 
@@ -79,9 +83,8 @@ import org.tspr3.Tspr3;
 int[] sorted = Tspr3.sort(input);
 ```
 
-La version `io.github.theforgotten-dev:tspr3:0.1.0` esta publicada en Maven
-Central (verificada el 3 de noviembre de 2026). Esta revision prepara **0.1.1**;
-no debe considerarse publicada hasta verificar su disponibilidad en Central.
+La version `io.github.theforgotten-dev:tspr3:0.1.1` esta publicada en Maven
+Central y su POM publico fue verificado el 3 de noviembre de 2026.
 El paquete Java sigue siendo `org.tspr3`, independiente del groupId.
 Consulta [el flujo de publicacion](docs/PUBLISHING.md).
 
@@ -90,6 +93,9 @@ Consulta [el flujo de publicacion](docs/PUBLISHING.md).
 Webhook autenticado, incremento de version, validacion y publicacion con
 sincronizacion atomica de commit/tag: [guia del pipeline](docs/LOCAL-PIPELINE.md).
 
+Consulta tambien [CHANGELOG](CHANGELOG.md), [contribucion](CONTRIBUTING.md),
+[seguridad](SECURITY.md) y [releases](RELEASING.md).
+
 ## Licencia
 
 Ambas bibliotecas se distribuyen bajo [Apache-2.0](LICENSE).
@@ -97,9 +103,8 @@ Copyright 2026 Juan Pablo Muñoz Leiva (theforgotten-dev).
 
 ## Alcance
 
-La API actual ordena enteros de 32 bits y conserva la entrada. El siguiente paso
-es definir claves, identidad y estabilidad para registros y estructuras. Una
-misma clave no permite eliminar el payload de varios registros.
+La API publica actual ordena enteros de 32 bits y conserva la entrada. El motor
+de registros genericos es interno y experimental; no forma parte de la ABI.
 
 Las mejoras de tiempo dependen de la distribucion. Los resultados y limites
 estan documentados; no se afirma novedad ni superioridad general del algoritmo.

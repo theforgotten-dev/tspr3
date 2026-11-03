@@ -1,0 +1,30 @@
+name: CodeQL
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  schedule:
+    - cron: '17 5 * * 1'
+permissions:
+  contents: read
+  security-events: write
+jobs:
+  analyze:
+    name: CodeQL C++ and Java
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v4
+      - uses: github/codeql-action/init@v3
+        with:
+          languages: c-cpp,java-kotlin
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+      - name: Build analyzed code
+        shell: powershell
+        run: |
+          .\build.ps1 -Task c
+          .\build.ps1 -Task maven
+      - uses: github/codeql-action/analyze@v3
