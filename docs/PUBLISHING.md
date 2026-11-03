@@ -81,3 +81,20 @@ No pegues secretos en el chat ni los guardes en archivos versionados.
 
 Los artefactos firmados locales no acreditan por sí solos la publicación:
 el metadata publico confirma 0.1.0 como ultima version el 3 de noviembre de 2026.
+
+## Diagnostico del intento 0.1.1
+
+El intento del 3 de noviembre genero el bundle y las cuatro firmas GPG validas,
+pero el plugin devolvio un fallo de deployment. Falta la respuesta anterior del
+servidor para determinar el motivo exacto. No se considera publicada la version.
+
+El ZIP generado en Windows contiene rutas internas con barras invertidas.
+Para crear una copia con separadores `/`, sin cambiar ningun archivo firmado:
+
+```powershell
+.\scripts\prepare-central-bundle.ps1
+```
+
+El script conserva el original y compara por SHA-256 cada entrada de ambos ZIP.
+La copia queda en `dist/tspr3-0.1.1-central.zip`, ignorada por Git, y puede
+subirse manualmente en el Portal. No sustituye la revision del error del servidor.
