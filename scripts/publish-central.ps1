@@ -23,6 +23,7 @@ try {
         @{Name='CENTRAL_TOKEN_PASSWORD';Prompt='Token password de Sonatype'},
         @{Name='MAVEN_GPG_PASSPHRASE';Prompt='Contrasena de la clave GPG'}
     )) {
+        if (![string]::IsNullOrEmpty([Environment]::GetEnvironmentVariable($item.Name,'Process'))) { continue }
         $secret = Read-Host $item.Prompt -AsSecureString
         try {
             $value = [Net.NetworkCredential]::new('', $secret).Password

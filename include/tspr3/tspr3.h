@@ -2,7 +2,7 @@
 #define TSPR3_PUBLIC_H
 #include <stddef.h>
 #include <stdint.h>
-#define TSPR3_VERSION "0.1.0"
+#define TSPR3_VERSION "0.1.1"
 #ifdef __cplusplus
 extern "C" {
 #endif

@@ -79,11 +79,11 @@ import org.tspr3.Tspr3;
 int[] sorted = Tspr3.sort(input);
 ```
 
-El JAR puede usarse directamente. Las coordenadas preparadas para Central son
-`io.github.theforgotten-dev:tspr3:0.1.0`, pero todavia no estan publicadas.
-El propietario confirmó el namespace verificado y la creación del token.
-La clave pública está publicada y las firmas locales fueron verificadas.
-Falta confirmar la publicación y resolución del artefacto desde Central.
+La version `io.github.theforgotten-dev:tspr3:0.1.0` esta publicada en Maven
+Central (verificada el 3 de noviembre de 2026). Esta revision prepara **0.1.1**;
+no debe considerarse publicada hasta verificar su disponibilidad en Central.
+El paquete Java sigue siendo `org.tspr3`, independiente del groupId.
+Consulta [el flujo de publicacion](docs/PUBLISHING.md).
 
 ## Licencia
 

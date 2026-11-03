@@ -27,5 +27,5 @@ try {
     & .\build\consumer\Release\consumer_cpp.exe
     if ($LASTEXITCODE -ne 0) { throw 'Fallo del consumidor C++ instalado.' }
     New-Item -ItemType Directory -Path dist -Force | Out-Null
-    Compress-Archive -LiteralPath $resolvedPrefix -DestinationPath dist\tspr3-windows-x64-0.1.0.zip -Force
+    Compress-Archive -LiteralPath $resolvedPrefix -DestinationPath dist\tspr3-windows-x64-0.1.1.zip -Force
 } finally { Pop-Location }

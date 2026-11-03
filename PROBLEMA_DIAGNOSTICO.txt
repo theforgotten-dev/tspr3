@@ -1,0 +1,22 @@
+﻿Diagnostico corregido - 2026-11-03
+
+Maven Central publica io.github.theforgotten-dev:tspr3:0.1.0.
+Verificado mediante el metadata publico de repo.maven.apache.org.
+La siguiente version preparada en este repositorio es 0.1.1.
+
+El groupId no determina ni transforma los paquetes Java.
+El import correcto es: import org.tspr3.Tspr3;
+No quitar "-dev" del groupId: eso identifica otro artefacto.
+
+Para consumir la version publicada:
+<dependency>
+  <groupId>io.github.theforgotten-dev</groupId>
+  <artifactId>tspr3</artifactId>
+  <version>0.1.0</version>
+</dependency>
+
+Despues de corregir coordenadas e import, ejecutar mvn -U clean verify
+y recargar el proyecto Maven en el IDE. No asumir que 0.1.1 esta
+publicada hasta confirmar su disponibilidad en Central.
+
+No incluir settings.xml, tokens ni claves privadas en Git.

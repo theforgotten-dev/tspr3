@@ -57,6 +57,7 @@ de ternas, la conservación de multiplicidades ni las condiciones de concatenaci
 - La interfaz compacta mantiene `(valor,cantidad)` y rechaza A.
 - Las decisiones por muestra solo afectan rendimiento, nunca corrección.
 - Los pesos C no se transfieren a Java sin recalibración.
+- AUTO en C usa el perfil logaritmico y el modelo predictivo; Java usa una muestra de hasta 512 ternas y una heuristica A/B. Pueden elegir rutas distintas sin cambiar la salida ordenada.
 - Los límites de memoria no incluyen buffers del llamador ni memoria residente total.
 - La API pública continúa especializada en `int32_t`/`int`; los registros genéricos son una etapa futura.
 

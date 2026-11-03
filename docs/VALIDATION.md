@@ -39,3 +39,16 @@ de 0.1.0 devolvió HTTP 404 el 14 de octubre de 2026. El estado del deployment
 en el Portal requiere una comprobación independiente. El código y los paquetes
 están disponibles en GitHub Releases. Estado completo:
 [PROYECTO-Y-DESPLIEGUE.md](PROYECTO-Y-DESPLIEGUE.md).
+
+## Revision 0.1.1 - 3 de noviembre de 2026
+
+- CMake/MSVC Release: 4/4 pruebas y consumidores C/C++ instalados correctos.
+- Java/JNI con JDK 21: 23.352 entradas por ejecucion; sin advertencias JNI.
+- Maven clean verify: 23.352 entradas y JAR, fuentes y Javadoc generados.
+- Perfil central-release validate y disponibilidad de la clave GPG: correctos.
+- Las pruebas con AddressSanitizer del nucleo pasaron 90.399 entradas durante
+  la revision previa al cambio de version; el algoritmo no se modifico.
+- Los benchmarks grandes no se repitieron: sus tiempos siguen siendo historicos.
+- 0.1.0 confirmada en Central; 0.1.1 preparada, pendiente de firma y subida.
+- build-java.ps1 utiliza JDK 17+ y genera bytecode compatible con Java 8.
+  La validacion historica con la JVM Java 8 se conserva arriba.

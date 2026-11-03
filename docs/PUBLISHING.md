@@ -1,6 +1,6 @@
 # Publicación Maven Central
 
-Coordenadas preparadas: `io.github.theforgotten-dev:tspr3:0.1.0`.
+Coordenadas preparadas: `io.github.theforgotten-dev:tspr3:0.1.1`.
 El usuario GitHub activo se verificó con `gh api user`. Esto no equivale a una
 verificación del namespace en Sonatype. El propietario confirmó su estado
 Verified el 14 de octubre de 2026. La URL `theforgotten-dev/tspr3` del POM
@@ -21,19 +21,20 @@ advertencias del código continúan tratándose como errores.
 
 Artefactos en `java/target`:
 
-- `tspr3-0.1.0.jar`
-- `tspr3-0.1.0-sources.jar`
-- `tspr3-0.1.0-javadoc.jar`
+- `tspr3-0.1.1.jar`
+- `tspr3-0.1.1-sources.jar`
+- `tspr3-0.1.1-javadoc.jar`
 
 Maven ejecuta las 23.352 entradas de prueba reales, no se limita a un resultado
 de Surefire sin pruebas. El perfil normal no firma ni sube archivos.
 
 ## Estado de preparación
 
-La clave GPG ya se generó y su parte pública está publicada. Se verificaron
-las firmas del JAR, fuentes, Javadoc y POM. El propietario confirmó la creación
-del token. El bundle local se revisó y no incluye claves privadas ni credenciales.
-Falta comprobar el deployment en el Portal y su publicación efectiva en Central.
+La clave GPG y las firmas verificadas anteriormente corresponden a 0.1.0.
+Para 0.1.1 se verificaron compilacion, pruebas, fuentes, Javadoc y metadatos;
+todavia no se firmo ni se subio un bundle. El token y la contrasena GPG no
+estan disponibles en la sesion de preparacion.
+La version 0.1.0 esta publicada; 0.1.1 requiere una nueva firma y un nuevo deployment.
 
 La licencia Apache-2.0 fue elegida por el propietario y está incluida en
 el repositorio, el paquete C/C++ y el JAR Java.
@@ -70,5 +71,13 @@ Los nombres del token son `CENTRAL_TOKEN_USERNAME` y `CENTRAL_TOKEN_PASSWORD`.
 El GPG instalado y sus credenciales se administran fuera del repositorio.
 Para el almacén y la clave configurados, usa `scripts/publish-central.ps1`,
 que solicita secretos con entrada oculta y configura la ruta de GPG.
+Tambien admite esas variables ya configuradas en el entorno del proceso.
+No pegues secretos en el chat ni los guardes en archivos versionados.
+
+```powershell
+.\scripts\publish-central.ps1 -CheckOnly
+.\scripts\publish-central.ps1
+```
+
 Los artefactos firmados locales no acreditan por sí solos la publicación:
-la consulta del POM público de 0.1.0 devolvió HTTP 404 el 14 de octubre de 2026.
+el metadata publico confirma 0.1.0 como ultima version el 3 de noviembre de 2026.

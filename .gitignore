@@ -6,3 +6,20 @@ dist/
 java/target/
 target/
 .secrets/
+
+# Local editor and credential configuration.
+.vscode/
+.env
+.env.*
+!.env.example
+**/settings.xml
+**/settings-security.xml
+**/settings.local.xml
+*.pem
+*.key
+*.p12
+*.pfx
+*.jks
+*.keystore
+secring.gpg
+private-keys-v1.d/
