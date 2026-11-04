@@ -325,7 +325,10 @@ static tspr3_status sort_compact(const int32_t *input,size_t n,tspr3_tri_mode mo
         for(i=0;i<k;++i) for(j=0;j<index[i].count;++j) output[pos++]=index[i].value;
         measured.data_bytes_written+=(uint64_t)n*sizeof(*output);free(index);
     }
-    if(stats) *stats=measured;return status;
+    if(stats) {
+        *stats=measured;
+    }
+    return status;
 }
 static tspr3_status sort_counts(const int32_t *in,size_t n,int32_t *out,tspr3_tri_stats *stats) {
     return sort_compact(in,n,TSPR3_TRI_COUNTS,out,stats);
