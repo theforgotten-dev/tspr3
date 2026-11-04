@@ -100,3 +100,46 @@ Servicio local, usuario único, una release simultánea. Objetivo de disponibili
 99% durante una sesión manual; p99 menor a 250 ms para dashboard, health y
 aceptación del job (la compilación continúa asíncrona). RPO 0 para transiciones
 persistidas y RTO de 30 minutos usando el checkout, estado y deployment ID.
+
+## Despliegue con `main` protegido
+
+La rama `main` exige commits firmados, los checks de Windows, Linux y CodeQL,
+una aprobacion de PR distinta del autor del ultimo push y conversaciones
+resueltas. No permite force-push ni eliminacion. Estas reglas tambien se aplican
+a administradores.
+
+El modo seguro actual se divide en dos etapas:
+
+1. Ejecutar `node scripts/release/request.mjs check patch` para preparar y probar
+   la siguiente version en un checkout aislado. Esta operacion no publica ni
+   modifica Git.
+2. Crear una rama de release desde `main`, aplicar el incremento y CHANGELOG,
+   ejecutar las mismas pruebas, crear un commit firmado y abrir un PR.
+3. Esperar los tres checks obligatorios y una revision externa. Cualquier push
+   nuevo descarta la aprobacion anterior y debe revisarse nuevamente.
+4. Despues del merge, crear el tag firmado desde el commit integrado, ejecutar
+   el deployment `USER_MANAGED` de Central, esperar `VALIDATED`, publicar ese
+   mismo deployment y verificar el SHA-256 del JAR publico.
+5. El tag activa `.github/workflows/release-artifacts.yml`, que vuelve a construir,
+   genera checksums y SBOM, atestigua procedencia y crea el GitHub Release.
+
+El comando `request.mjs publish` implementa el flujo transaccional original,
+pero su push directo a `main` es incompatible con la proteccion actual. No debe
+usarse hasta dividir `run.ps1` en una fase `prepare` que abra el PR y una fase
+`publish` que solo opere sobre el commit ya integrado y aprobado. No se debe
+agregar un bypass personal para conservar la revision independiente.
+
+### Automatizacion recomendada
+
+Mantener el webhook en `127.0.0.1` para validaciones locales. Para automatizar
+la publicacion, usar un workflow manual (`workflow_dispatch`) con un entorno
+GitHub llamado `maven-central` que requiera aprobador. El workflow debe aceptar
+un tag SemVer ya integrado, descargar secretos desde el almacén del entorno,
+ejecutar la subida `USER_MANAGED`, conservar el deployment ID como artefacto y
+publicar solo despues de la aprobacion del entorno. Nunca almacenar tokens,
+passphrases, `settings.xml`, keyrings ni archivos DPAPI en el repositorio.
+
+Antes de habilitar esa automatizacion, rotar el token de Central y la passphrase
+GPG que fueron expuestos. Configurar los reemplazos mediante
+`scripts/release/set-secrets.ps1`; el archivo resultante permanece en
+`%LOCALAPPDATA%\TSPR3\pipeline\release-secrets.json` y no se copia al checkout.
